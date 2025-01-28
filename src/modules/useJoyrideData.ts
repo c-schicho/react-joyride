@@ -113,7 +113,7 @@ export default function useJoyrideData(
           const y = offset?.top?.y ?? 0;
           const flipped = !!placement && placement !== step.placement;
 
-          if (['top', 'right', 'left'].includes(placement) && !flipped && !hasCustomScroll) {
+          if (['left', 'right', 'top'].includes(placement) && !flipped && !hasCustomScroll) {
             scrollY = Math.floor(y - scrollOffset);
           } else {
             scrollY -= step.spotlightPadding;
@@ -346,7 +346,16 @@ export default function useJoyrideData(
       });
     }
 
-    if (previousStep && changedState('status', [STATUS.FINISHED, STATUS.SKIPPED])) {
+    if (step && changedState('status', [STATUS.SKIPPED])) {
+      callback?.({
+        ...state,
+        index: index - 1,
+        // Return the step when the tour is skipped
+        step,
+        type: EVENTS.TOUR_END,
+      });
+      store.current.reset();
+    } else if (previousStep && changedState('status', [STATUS.FINISHED])) {
       callback?.({
         ...state,
         index: index - 1,
